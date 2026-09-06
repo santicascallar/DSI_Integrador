@@ -35,3 +35,30 @@ EN: 22 tokens
 El español consume una mayor cantidad de tokens por consulta en comparación con el inglés debido a la codificación del vocabulario. Si el sistema procesa miles de consultas diarias, esta diferencia genera un incremento acumulativo significativo en los costos.
 
 B.1
+Los analistas sufren una enorme carga cognitiva al tener que leer, interpretar y contrastar notas de ojeadores de múltiples fuentes, lo que genera una alta latencia (semanas) para procesar un perfil completo de un jugador antes de una decisión de mercado.
+Lo sufre la secretaría técnica y los directores deportivos del club de manera diaria y continua, especialmente en los períodos previos y durante los mercados de pases.
+Se pierden oportunidades de fichaje a tiempo frente a otros clubes competidores, se toman decisiones basadas en sesgos o lecturas incompletas de informes dispersos, y se desaprovecha el conocimiento histórico acumulado en documentos de texto no estructurados.
+
+B.2
+El sistema lo utilizarían secretarios técnicos, analistas de scouting y directores deportivos.
+Hoy en día el usuario debe buscar manualmente en carpetas compartidas o sistemas de archivos, leer decenas de páginas de notas subjetivas escritas por diferentes ojeadores, y cruzar esos datos de forma mental o mediante planillas rudimentarias con estadísticas de rendimiento para armar un perfil básico del jugador.
+
+B.3
+
+Entrada del usuario(caos): ¿Tiene el perfil del jugador Neymar Jr.?
+Intención(LLM): CONSULTA_PERFIL
+Parámetros(LLM): {"jugador": "Neymar Jr."}
+Acción de backend(determinista): SELECT * FROM jugadores WHERE nombre = 'Neymar Jr.'
+Riesgo: Bajo (consulta basica de lectura)
+
+Entrada del usuario(caos): Buscame los informes tácticos que hablan sobre la presión alta de los extremos en el informe de Europa.
+Intención(LLM): CONSULTA_INFORMES
+Parámetros(LLM): {"criterio": "presión alta", "posicion": "extremos", "fuente": "Europa"}
+Acción de backend(determinista): vector_search(query="presión alta", filter={"posicion": "extremos", "fuente": "Europa"})
+Riesgo: Bajo (búsqueda sobre repositorio vectorial de documentos cualitativos)
+
+Entrada del usuario(caos): Subí este nuevo archivo PDF con el informe de scouting del juvenil Aranda y actualizá sus datos.
+Intención(LLM): ALTA_JUGADOR_SCOUTING
+Parámetros(LLM): {"jugador": "Aranda", "archivo": "informe_aranda.pdf", "posicion": "Mediocampista"}
+Acción de backend(determinista): INSERT INTO informes_scouting (nombre_jugador, posicion, archivo_pdf) VALUES ('Aranda', 'Mediocampista', 'informe_aranda.pdf') + chunking_and_vectorize(pdf)
+Riesgo: Alto (operación de escritura)
