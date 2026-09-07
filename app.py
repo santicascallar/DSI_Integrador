@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
-import google.generativeai as genai
-from google.api_core.exceptions import GoogleAPICallError, RetryError
+from google import genai
+from google.genai.errors import APIError
 from pydantic import ValidationError
 from schemas import ConsultaScoutingSchema
 
@@ -9,9 +9,9 @@ load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    raise ValueError("No se encontró la GEMINI_API_KEY en las variables de entorno")
+    raise ValueError("No se encontró la GEMINI_API_KEY en las variables de entorno.")
 
-genai.configure(api_key=api_key)
+client = genai.Client(api_key=api_key)
 
 SYSTEM_PROMPT = """
 Sos el componente de interpretación de lenguaje natural del sistema Futbol_Inform, una plataforma de análisis y scouting de futbolistas.
@@ -20,25 +20,25 @@ Las únicas intenciones permitidas son: CONSULTA_PERFIL, CONSULTA_INFORMES, ALTA
 No inventes información y utilizá únicamente los datos de la consulta.
 """
 
-user_input = "¿Tiene el perfil del jugador Neymar Jr.?"
+#Input de prueba inicial
+user_input = "Pasame los datos de Julián Álvarez"
 
 try:
     print(f"Enviando consulta a Gemini: '{user_input}'...\n")
     
-    model = genai.GenerativeModel(
-        model_name="gemini-2.5-flash",
-        system_instruction=SYSTEM_PROMPT,
-        generation_config={
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=user_input,
+        config={
+            "system_instruction": SYSTEM_PROMPT,
             "response_mime_type": "application/json",
             "response_schema": ConsultaScoutingSchema,
-        }
+        },
     )
-
-    response = model.generate_content(user_input)
 
     resultado_validado = ConsultaScoutingSchema.model_validate_json(response.text)
 
-    print("RESULTADO EXTRAÍDO:")
+    print("-- RESULTADO EXTRAÍDO --")
     print(f"Intención: {resultado_validado.intencion}")
     print(f"Jugador: {resultado_validado.jugador}")
     print(f"Criterio: {resultado_validado.criterio}")
@@ -48,7 +48,7 @@ try:
 
 except ValidationError as e:
     print(f"El modelo devolvió datos que no cumplen con el esquema: {e}")
-except (GoogleAPICallError, RetryError) as e:
+except APIError as e:
     print(f"Ocurrió un problema al comunicarse con los servidores de Google: {e}")
 except Exception as e:
-    print(f"[ERROR INESPERADO]: {e}")
+    print(f"{e}")
