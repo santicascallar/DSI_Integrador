@@ -1,7 +1,7 @@
-A.1
+## A.1
 Futbol_Inform es una plataforma de análisis de scouting que centraliza informes tácticos y cualitativos de futbolistas elaborados por ojeadores de diferentes paises. El proceso manual que busca automatizar es la lectura y extracción de valor de los reportes en texto libre para cruzarlos con métricas estructuradas de rendimiento, permitiendo a la secretaría técnica responder consultas complejas de mercado sin tener que leer carpetas enteras de documentos desestructurados.
 
-A.2
+## A.2
 Prompt utilizado:
 Actuá como el sistema de atención de Futbol_Inform. Un usuario pregunta: Necesito un informe completo de scouting sobre Franco Mastantuono que incluya sus estadísticas en el último semestre, las observaciones tácticas de nuestros ojeadores en Europa y si el club actual aceptaría negociar por debajo de la cláusula de rescisión. Respondé como lo haría el sistema.
 
@@ -18,7 +18,7 @@ Qué le faltó al modelo para responder bien:
 - Contexto actualizado de las negociaciones de mercado reales y contractuales del jugador en tiempo real
 
 
-A.3 - PEAS extendido
+## A.3 - PEAS extendido
 Performance: Precisión y relevancia en la extracción de información de los informes, reducción del tiempo de búsqueda y minimización de alucinaciones al responder consultas sobre jugadores.
 
 Environment: Opera en la nube para el equipo de scouting y directiva del club. Se integra con bases de datos relacionales de estadísticas de jugadores y sistemas de gestión interna de la secretaría técnica.
@@ -29,21 +29,21 @@ Sensors: Recibe consultas en lenguaje natural (texto/chat) de los analistas, doc
 
 Base de conocimiento: Repositorio documental de informes de scouting cualitativos, base de datos SQL con estadísticas cuantitativas de los futbolistas y perfiles históricos de mercado (como jugadores retirados).
 
-A.4
+## A.4
 ES: 27 tokens
 EN: 22 tokens
 El español consume una mayor cantidad de tokens por consulta en comparación con el inglés debido a la codificación del vocabulario. Si el sistema procesa miles de consultas diarias, esta diferencia genera un incremento acumulativo significativo en los costos.
 
-B.1
+## B.1
 Los analistas sufren una enorme carga cognitiva al tener que leer, interpretar y contrastar notas de ojeadores de múltiples fuentes, lo que genera una alta latencia (semanas) para procesar un perfil completo de un jugador antes de una decisión de mercado.
 Lo sufre la secretaría técnica y los directores deportivos del club de manera diaria y continua, especialmente en los períodos previos y durante los mercados de pases.
 Se pierden oportunidades de fichaje a tiempo frente a otros clubes competidores, se toman decisiones basadas en sesgos o lecturas incompletas de informes dispersos, y se desaprovecha el conocimiento histórico acumulado en documentos de texto no estructurados.
 
-B.2
+## B.2
 El sistema lo utilizarían secretarios técnicos, analistas de scouting y directores deportivos.
 Hoy en día el usuario debe buscar manualmente en carpetas compartidas o sistemas de archivos, leer decenas de páginas de notas subjetivas escritas por diferentes ojeadores, y cruzar esos datos de forma mental o mediante planillas rudimentarias con estadísticas de rendimiento para armar un perfil básico del jugador.
 
-B.3
+## B.3
 
 Entrada del usuario(caos): ¿Tiene el perfil del jugador Neymar Jr.?
 Intención(LLM): CONSULTA_PERFIL
@@ -62,6 +62,7 @@ Intención(LLM): ALTA_JUGADOR_SCOUTING
 Parámetros(LLM): {"jugador": "Aranda", "archivo": "informe_aranda.pdf", "posicion": "Mediocampista"}
 Acción de backend(determinista): INSERT INTO informes_scouting (nombre_jugador, posicion, archivo_pdf) VALUES ('Aranda', 'Mediocampista', 'informe_aranda.pdf') + chunking_and_vectorize(pdf)
 Riesgo: Alto (operación de escritura)
+
 ## B.4 - Decisión técnica: ¿Reglas o LLM?
 
 El sistema Futbol_Inform utiliza un enfoque híbrido, combinando componentes probabilísticos basados en LLM con componentes deterministas implementados mediante código, SQL y búsquedas sobre la base de conocimiento.
@@ -150,7 +151,6 @@ Justificación de los campos:
 
 
 ### b) Esquema de la base de datos (SQL)
-
 Se utilizará una tabla principal para almacenar los jugadores y una tabla de interacciones para registrar las consultas realizadas al sistema.
 
 CREATE TABLE jugadores (
@@ -192,7 +192,6 @@ La tabla interacciones permite registrar qué consulta realizó el usuario, qué
 
 
 ### c) System Prompt base
-
 Sos el componente de interpretación de lenguaje natural del sistema Futbol_Inform, una plataforma de análisis y scouting de futbolistas.
 
 Tu única función es analizar la consulta del usuario y devolver un objeto JSON estructurado.
@@ -228,13 +227,11 @@ Formato esperado:
 ## B.6 - Flujo de valor y flujo del sistema
 
 ### Flujo de valor
-
 Consulta del usuario → interpretación de la necesidad → búsqueda o actualización de información → respuesta basada en datos reales → reducción del tiempo necesario para analizar información de scouting.
 
 El valor generado consiste en permitir que la secretaría técnica consulte grandes cantidades de información cualitativa y cuantitativa sin tener que revisar manualmente carpetas completas de informes.
 
 ### Flujo técnico
-
 [Usuario]
 Escribe una consulta en lenguaje natural o adjunta un informe
         ↓
@@ -261,5 +258,4 @@ Recibe una respuesta clara basada en la información de Futbol_Inform
 
 
 ## B.7 - Hipótesis más riesgosa
-
 La hipótesis más riesgosa es que los informes de scouting y los datos almacenados por Futbol_Inform contengan información suficiente, actualizada y de calidad para que el sistema pueda responder correctamente las consultas de la secretaría técnica sin depender de información externa no disponible.
