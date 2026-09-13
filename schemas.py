@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, field_validator
 from typing import Literal, Optional
 
 class ConsultaScoutingSchema(BaseModel):
-    intencion: Literal["CONSULTA_PERFIL", "CONSULTA_INFORMES", "ALTA_JUGADOR_SCOUTING"] = Field(
+    intencion: Literal["CONSULTA_PERFIL", "CONSULTA_INFORMES", "ALTA_JUGADOR_SCOUTING", "FUERA_DE_ALCANCE"] = Field(
         description="Intención detectada en la consulta del usuario."
     )
     jugador: Optional[str] = Field(default=None, description="Nombre del futbolista")
