@@ -7,3 +7,4 @@
 ## Guía de Instalación y Ejecución:
 ### Tener instalado Python (versión 3.10 o superior)
 ### Instalar dependencias: python -m pip install google-genai pydantic python-dotenv
+### python -m pip install google-genai faiss-cpu numpy python-dotenv

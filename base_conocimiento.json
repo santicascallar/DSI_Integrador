@@ -1,0 +1,137 @@
+[
+  {
+    "id": "DOC-001",
+    "descripcion_semantica": "Informe táctico profundo sobre la presión alta en salida de balón del rival, destacando la coordinación de los extremos para bloquear líneas de pase interiores y forzar errores en campo contrario, con matices de intensidad física y rigor defensivo.",
+    "metadatos": {
+      "posicion": "Extremo",
+      "vigente": true,
+      "tags_regionales": ["presion", "bloque alto", "intensidad"]
+    }
+  },
+  {
+    "id": "DOC-002",
+    "descripcion_semantica": "Evaluación de rendimiento del mediocampista central, analizando su capacidad de distribución de juego, lectura de espacios reducidos, transición rápida defensa-ataque y templanza bajo presión rival en partidos de alta exigencia internacional.",
+    "metadatos": {
+      "posicion": "Mediocampista",
+      "vigente": true,
+      "tags_regionales": ["cerebro", "salida limpia", "distribución"]
+    }
+  },
+  {
+    "id": "DOC-003",
+    "descripcion_semantica": "Análisis físico y técnico del lateral ofensivo, enfocado en su desborde por banda, recorrido constante, centros al área con ventaja y retroceso defensivo en coberturas de espacios dejados por los centrales.",
+    "metadatos": {
+      "posicion": "Lateral",
+      "vigente": false,
+      "tags_regionales": ["carrilero", "desborde", "ida y vuelta"]
+    }
+  },
+  {
+    "id": "DOC-004",
+    "descripcion_semantica": "Scouting de delantero centro referencia de área, evaluando su juego de espaldas al arco, capacidad para fijar centrales, movimientos de desmarque en diagonal y efectividad en la definición de primera con ambas piernas.",
+    "metadatos": {
+      "posicion": "Delantero",
+      "vigente": true,
+      "tags_regionales": ["nueve clásico", "pivot", "goleador"]
+    }
+  },
+  {
+    "id": "DOC-005",
+    "descripcion_semantica": "Revisión táctica de defensor central tiempista, destacando su liderazgo en la línea defensiva, anticipos aéreos defensivos, salida prolija desde el fondo y coberturas correctoras ante desatenciones de los marcadores de punta.",
+    "metadatos": {
+      "posicion": "Defensor",
+      "vigente": true,
+      "tags_regionales": ["marcador", "juego aéreo", "liderazgo"]
+    }
+  },
+  {
+    "id": "DOC-006",
+    "descripcion_semantica": "Informe sobre el rendimiento de un arquero moderno con gran dominio del juego de pies, seguridad en los centros cruzados, achique en mano a mano y rapidez para iniciar contrataques rápidos con saques frontales.",
+    "metadatos": {
+      "posicion": "Arquero",
+      "vigente": true,
+      "tags_regionales": ["arquero líbero", "reflejos", "juego aéreo"]
+    }
+  },
+  {
+    "id": "DOC-007",
+    "descripcion_semantica": "Seguimiento de mediocampista mixto box-to-box, analizando su despliegue físico interminable, llegada sorpresiva al área contraria, coberturas defensivas en zona medular y estadísticas de duelos ganados.",
+    "metadatos": {
+      "posicion": "Mediocampista",
+      "vigente": true,
+      "tags_regionales": ["todoterreno", "box-to-box", "despliegue"]
+    }
+  },
+  {
+    "id": "DOC-008",
+    "descripcion_semantica": "Análisis de extremo rápido gambeteador, especializado en el uno contra uno por banda, diagonales hacia adentro para perfil de remate y generación de faltas en los últimos tres cuartos de cancha.",
+    "metadatos": {
+      "posicion": "Extremo",
+      "vigente": false,
+      "tags_regionales": ["desequilibrante", "gambeta", "uno contra uno"]
+    }
+  },
+  {
+    "id": "DOC-009",
+    "descripcion_semantica": "Evaluación táctica de lateral defensivo puro, priorizando la solidez en el marcaje individual, coberturas de área, porcentaje de quites exitosos y bajo riesgo en la toma de decisiones defensivas.",
+    "metadatos": {
+      "posicion": "Lateral",
+      "vigente": true,
+      "tags_regionales": ["marca férrea", "clásico", "equilibrio"]
+    }
+  },
+  {
+    "id": "DOC-010",
+    "descripcion_semantica": "Scouting de segundo delantero o media punta creativo, enfocado en el último pase filtrado, visión periférica, lectura de posicionamientos entre líneas rivales y remates de media distancia.",
+    "metadatos": {
+      "posicion": "Mediocampista",
+      "vigente": true,
+      "tags_regionales": ["enganche", "asistencias", "entre líneas"]
+    }
+  },
+  {
+    "id": "DOC-011",
+    "descripcion_semantica": "Informe sobre defensor central, destacando su contundencia en los duelos individuales, juego físico implacable, despejes providenciales y carácter competitivo en partidos de máxima presión.",
+    "metadatos": {
+      "posicion": "Defensor",
+      "vigente": false,
+      "tags_regionales": ["férreo", "duelos", "experiencia"]
+    }
+  },
+  {
+    "id": "DOC-012",
+    "descripcion_semantica": "Análisis de delantero móvil y asociativo, con capacidad para tirarse atrás a colaborar en la generación de juego, arrastre de marcas y generación de espacios libres para la llegada de los volantes ofensivos.",
+    "metadatos": {
+      "posicion": "Delantero",
+      "vigente": true,
+      "tags_regionales": ["falso nueve", "asociativo", "movilidad"]
+    }
+  },
+  {
+    "id": "DOC-013",
+    "descripcion_semantica": "Evaluación de mediocampista central recuperador posicional, especializado en el corte de líneas de pase rivales, coberturas tácticas posicionales y simplicidad en la entrega posterior para ordenar al equipo.",
+    "metadatos": {
+      "posicion": "Mediocampista",
+      "vigente": true,
+      "tags_regionales": ["tapón", "equilibrio", "recuperación"]
+    }
+  },
+  {
+    "id": "DOC-014",
+    "descripcion_semantica": "Scouting de carrilero con proyección ofensiva en sistemas de línea de tres defensores, analizando su recorrido profundo por la banda, amplitud táctica y precisión en centros al segundo palo.",
+    "metadatos": {
+      "posicion": "Lateral",
+      "vigente": true,
+      "tags_regionales": ["carrilero largo", "amplitud", "línea de tres"]
+    }
+  },
+  {
+    "id": "DOC-015",
+    "descripcion_semantica": "Informe integral sobre extremo goleador con tendencia a cerrar el ataque, aprovechando rebotes en el área chica, juego aéreo ofensivo sorpresivo y gran eficacia en ejecuciones de jugadas de pelota parada.",
+    "metadatos": {
+      "posicion": "Extremo",
+      "vigente": true,
+      "tags_regionales": ["llegador", "olfato goleador", "segundo palo"]
+    }
+  }
+]
