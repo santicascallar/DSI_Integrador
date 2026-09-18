@@ -120,7 +120,7 @@
     "id": "DOC-014",
     "descripcion_semantica": "Scouting de carrilero con proyección ofensiva en sistemas de línea de tres defensores, analizando su recorrido profundo por la banda, amplitud táctica y precisión en centros al segundo palo.",
     "metadatos": {
-      "posicion": "Lateral",
+      "position": "Lateral",
       "vigente": true,
       "tags_regionales": ["carrilero largo", "amplitud", "línea de tres"]
     }
@@ -130,8 +130,26 @@
     "descripcion_semantica": "Informe integral sobre extremo goleador con tendencia a cerrar el ataque, aprovechando rebotes en el área chica, juego aéreo ofensivo sorpresivo y gran eficacia en ejecuciones de jugadas de pelota parada.",
     "metadatos": {
       "posicion": "Extremo",
-      "vigente": true,
+      "vigente": "true",
       "tags_regionales": ["llegador", "olfato goleador", "segundo palo"]
+    }
+  },
+  {
+    "id": "DOC-016",
+    "descripcion_semantica": "Informe sobre un delantero centro goleador, con buen cabezaso y movilidad fuera del área.",
+    "metadatos": {
+      "posicion": "Delantero",
+      "vigente": true,
+      "tags_regionales": ["goleador", "movilidad", "nueve goleador"]
+    }
+  },
+  {
+    "id": "DOC-017",
+    "descripcion_semantica": "Informe sobre un delantero que tiene mucho gol, con buena pegada y cabezaso. Además de gran movilidad.",
+    "metadatos": {
+      "posicion": "Delantero",
+      "vigente": true,
+      "tags_regionales": ["goleador", "movilidad", "nueve goleador"]
     }
   }
 ]

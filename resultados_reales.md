@@ -1,0 +1,5 @@
+# Resultados Reales - Killer Queries
+
+- Consulta 1 -> ID: DOC-008 | Distancia: 0.3198 | Texto: Análisis de extremo rápido gambeteador, especializado en el uno contra uno por banda, diagonales hacia adentro para perfil de remate y generación de faltas en los últimos tres cuartos de cancha.
+- Consulta 2 -> ID: DOC-004 | Distancia: 0.2420 | Texto: Scouting de delantero centro referencia de área, evaluando su juego de espaldas al arco, capacidad para fijar centrales, movimientos de desmarque en diagonal y efectividad en la definición de primera con ambas piernas.
+- Consulta 3 -> ID: DOC-010 | Distancia: 0.2857 | Texto: Scouting de segundo delantero o media punta creativo, enfocado en el último pase filtrado, visión periférica, lectura de posicionamientos entre líneas rivales y remates de media distancia.

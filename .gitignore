@@ -1,2 +1,5 @@
 .env
 __pycache__
+chroma_db
+chroma_db_purgada
+vector_index.faiss
