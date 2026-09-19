@@ -120,4 +120,44 @@ Resultado esperado: El sistema debe arrojar distancia muy alta o resultados vac�
 Resultado real: ID: DOC-010 | Distancia: 0.2857
 ¿Pasó?: No
 
-C
+## C.1 - Cadena de coherencia con la Entrega 1
+
+Base de Conocimiento del PEAS: En la Entrega 1 se definió un repositorio documental de informes de scouting. En la Entrega 2 se implementa mediante la colección persistente de ChromaDB, donde se almacenan los documentos vectorizados junto con sus metadatos.
+
+Campos de filtrado de la Matriz de Intenciones: En la Entrega 1 se definieron parámetros como posicion y fuente para CONSULTA_INFORMES. En la Entrega 2 estos campos pasan a utilizarse como metadatos de ChromaDB para realizar filtros duros mediante where.
+
+Parámetros extraídos del texto_libre: El LLM extrae jugador, criterio, posicion, fuente y archivo mediante ConsultaScoutingSchema. Estos parámetros pueden utilizarse para realizar la búsqueda semántica y construir los filtros de la consulta a ChromaDB.
+
+El vector_search planteado en la Entrega 1 para buscar informes se implementa en esta entrega mediante coleccion.query(), combinando la búsqueda por similitud semántica con filtros sobre los metadatos.
+
+De esta manera, la Entrega 2 implementa la Base de Conocimiento que en la Entrega 1 se había definido a nivel de diseño.
+
+## C.2 - El umbral de aceptación
+
+En A.2 se definió de forma teórica un umbral de similitud coseno de 0.75. Sin embargo, en ChromaDB se trabaja con distancia coseno, donde un valor menor representa una mayor similitud entre la consulta y el documento.
+
+En las pruebas realizadas todavía no se pudo establecer un único umbral de distancia que permita separar correctamente todos los resultados válidos de los inválidos.
+
+Esto se puede observar en la Killer Query 3:
+
+Consulta: Necesito un base armador con buen manejo de pick and roll para jugadas de tres puntos
+
+Resultado esperado: El sistema debería responder "no tengo esa información".
+
+Resultado real: DOC-010 | Distancia: 0.2857
+
+¿Pasó?: No
+
+Aunque ChromaDB encontró un documento cercano, la consulta pertenece al básquet y no al dominio de Futbol_Inform. Esto demuestra que devolver siempre el resultado más cercano puede generar respuestas incorrectas.
+
+Además, los resultados de las Killer Queries muestran que el umbral todavía necesita ser calibrado, ya que una consulta válida obtuvo una distancia de 0.3198 mientras que la consulta fuera del dominio obtuvo 0.2857. Por lo tanto, actualmente no alcanza con utilizar únicamente la distancia para separar consultas válidas de consultas fuera del dominio.
+
+En este caso también puede utilizarse la intención FUERA_DE_ALCANCE definida en la Entrega 1 para detectar una consulta que no corresponda al scouting de fútbol antes de realizar la búsqueda vectorial.
+
+## C.3 - Cierre: dónde se conecta
+
+Actualmente la búsqueda híbrida devuelve los documentos encontrados en ChromaDB como datos de Python.
+
+Para convertir estos resultados en una respuesta real al usuario falta incorporar un orquestador RAG.
+
+El orquestador conectaría la interpretación de la consulta realizada por el LLM con la búsqueda en ChromaDB y posteriormente enviaría los documentos recuperados al LLM para generar la respuesta final utilizando únicamente la información obtenida de la Base de Conocimiento.
