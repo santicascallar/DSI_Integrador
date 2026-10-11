@@ -1,6 +1,6 @@
 ## A.1 — Autopsia del contexto estático
 
-Desangre de tokens: La base de conocimientos maneja más de 5.000 informes de scouting y PDFs tácticos. Pasarlos todos enteros en el System Prompt en cada consulta generaría un costo insostenible en tokens de entrada y latencias muy altas.
+Desangre de tokens: La base de conocimientos maneja 17 informes de scouting y PDFs tácticos. Pasarlos todos enteros en el System Prompt en cada consulta generaría un costo insostenible en tokens de entrada y latencias muy altas.
 
 Lost in the middle: Si el informe clave sobre la presión alta de un lateral se encuentra enterrado en medio de 50 páginas de estadísticas masivas, el modelo de lenguaje tenderá a ignorarlo u omitirlo por la fatiga del contexto largo.
 
@@ -79,46 +79,43 @@ B. Lo resuelve integrando filtrado híbrido nativo mediante su parámetro where,
 C. Lo resuelve ofreciendo un motor con soporte CRUD completo a través de métodos como upsert, lo que permite modificar o actualizar informes de jugadores de forma individual y eficiente sin necesidad de reindexar toda la base de datos.
 
 ## B.3 - Evento de negocio en caliente
-id_objetivo = "DOC-001"
-print(f"\nSimulando evento en caliente para el documento {id_objetivo}...")
+La demostración está implementada y es ejecutable con `python evento_negocio.py`. Usa la colección persistente, crea un ID temporal, verifica el resultado con `get()` y lo elimina al finalizar.
 
-### Actualiza el estado o la descripción
-coleccion.upsert(
-    ids=[id_objetivo],
-    documents=["[ACTUALIZADO] Nuevo informe táctico profundo sobre la presión alta, con ajustes tácticos post-partido y revisión de rendimiento."],
-    metadatas=[{"posicion": "Extremo", "vigente": "False", "tags": "pressing, actualizado"}]
-)
-resultado_verificacion = coleccion.get(ids=[id_objetivo])
-print("Documento actualizado verificado con get():")
-print(resultado_verificacion)
+Salida capturada:
 
-Se utiliza upsert porque actúa como una operación idempotente (crea el registro si no existe o lo actualiza si ya existe), evitando los errores de ID duplicado que arrojaría add y la falla de no encontrar el registro que daría update si el documento aún no fue creado.
+Upsert verificado para __B3_UPSERT_DEMO__.
+Documento: Informe temporal para demostrar un upsert de negocio.
+Metadatos: {'posicion': 'Extremo', 'tags': 'demo', 'vigente': False}
+Registro temporal __B3_UPSERT_DEMO__ eliminado; colección restaurada.
+
+`upsert` crea o reemplaza el registro por ID; `get()` comprueba la escritura. El ejemplo usa un ID temporal para no sobrescribir un informe real.
 
 ## B.5 - ETL y purga semántica
-Se eliminó uno de los dos casi-duplicados que había. Al tener redacciones distintas, descripciones con jerga variada e IDs diferentes, el motor relacional (SELECT DISTINCT) los interpreta como registros completamente únicos e independientes, permitiendo que la redundancia pase desapercibida. Solo un enfoque semántico basado en espacio vectorial y distancia coseno permite comprender que conceptualmente expresan exactamente la misma información.
+La ETL corrige cuatro problemas del dataset antes de persistirlo:
+
+- Mapea la clave real `position` de DOC-014 a `posicion`.
+- Normaliza `vigente` a booleano, incluso cuando la entrada llega como texto `"true"` o `"false"`.
+- Si encuentra IDs repetidos, conserva el primero y agrega sufijos deterministas (`-2`, `-3`, etc.) a los siguientes; los embeddings ya no se pisan en un diccionario por colisión de ID.
+- Compara todos los pares cercanos y conserva un único documento por grupo de duplicados relacionados, en vez de saltarse comparaciones cuando un documento ya fue marcado.
+
+El corte de distancia coseno deja de ser el valor fijo `0.08`: se calcula en cada corrida como el punto medio entre DOC-016/DOC-017 (par etiquetado como duplicado) y los pares de control DOC-016/DOC-005 y DOC-017/DOC-006 (etiquetados como distintos). Se exige una separación mínima de `0.01`; si no se cumple, la ETL se detiene sin purgar. Así el umbral se basa en distancias de los embeddings actuales, no en una constante sin calibrar. La base JSON actual contiene 17 IDs únicos; el caso de colisión queda cubierto en la transformación para cuando aparezca.
 
 ## B.6 - Killer Queries
 
-### 1
-Consulta: Preciso un wing eléctrico que desborde por la raya y tire centros venenosos
-Que pone a prueba: Poder semántico: jerga sin palabras exactas del documento
-Resultado esperado: Debe encontrar el informe de extremo (DOC-008)
-Resultado real: DOC-008 | Distancia: 0.3198
-¿Pasó?: Si
+Las siguientes salidas fueron generadas por `killer_queries.py` y están registradas en `resultados_reales.md`.
 
-### 2
-Consulta: Revisión táctica de defensor central tiempista y fuerte
-Que pone a prueba: El metadato salva el día: la semántica cruda traería un desastre, el filtro lo bloquea.
-Resultado esperado: El sistema no debe traer al defensor central, sino restringirse estrictamente al filtro de delanteros.
-Resultado real: DOC-004 (Delantero) | Distancia: 0.2420
-¿Pasó?: Si
+### Consulta 1: 'Preciso un wing eléctrico que desborde por la raya y tire centros venenosos'
+Resultado: DOC-008 | Distancia coseno: 0.3198.
+Evaluación: recupera el informe del extremo ante una consulta expresada con jerga distinta a la descripción del documento.
 
-### 3
-Consulta: Necesito un base armador con buen manejo de pick and roll para jugadas de tres puntos
-Que pone a prueba: Prueba de estrés: consulta fuera del catálogo — debe responder “no tengo eso”
-Resultado esperado: El sistema debe arrojar distancia muy alta o resultados vacíos / irrelevantes (equivalente a "no tengo eso").
-Resultado real: ID: DOC-010 | Distancia: 0.2857
-¿Pasó?: No
+### Consulta 2: 'Revisión táctica de defensor central tiempista y fuerte'
+Sin filtro: DOC-005 | Distancia coseno: 0.0835.
+Con filtro `posicion=Delantero`: DOC-004 | Distancia coseno: 0.2420.
+Evaluación: sin filtro gana el defensor semánticamente más cercano; con el filtro estricto se devuelve un delantero, demostrando el contraste solicitado.
+
+### Consulta 3: 'Necesito un base armador con buen manejo de pick and roll para jugadas de tres puntos'
+Resultado: rechazada por estar fuera del dominio; no se generó embedding ni se consultó ChromaDB.
+Evaluación: no se acepta un informe futbolístico por proximidad vectorial para responder una consulta de básquet.
 
 ## C.1 - Cadena de coherencia con la Entrega 1
 
@@ -134,25 +131,9 @@ De esta manera, la Entrega 2 implementa la Base de Conocimiento que en la Entreg
 
 ## C.2 - El umbral de aceptación
 
-En A.2 se definió de forma teórica un umbral de similitud coseno de 0.75. Sin embargo, en ChromaDB se trabaja con distancia coseno, donde un valor menor representa una mayor similitud entre la consulta y el documento.
+`killer_queries.py` define una distancia coseno máxima inicial de `0.33` para aceptar un resultado de recuperación. Se eligió para conservar la consulta futbolística válida cuyo último resultado guardado fue 0.3198, con aproximadamente 0.01 de margen. No equivale al umbral teórico de similitud 0.75 de A.2: ese valor todavía no está calibrado para los embeddings y consultas de este corpus.
 
-En las pruebas realizadas todavía no se pudo establecer un único umbral de distancia que permita separar correctamente todos los resultados válidos de los inválidos.
-
-Esto se puede observar en la Killer Query 3:
-
-Consulta: Necesito un base armador con buen manejo de pick and roll para jugadas de tres puntos
-
-Resultado esperado: El sistema debería responder "no tengo esa información".
-
-Resultado real: DOC-010 | Distancia: 0.2857
-
-¿Pasó?: No
-
-Aunque ChromaDB encontró un documento cercano, la consulta pertenece al básquet y no al dominio de Futbol_Inform. Esto demuestra que devolver siempre el resultado más cercano puede generar respuestas incorrectas.
-
-Además, los resultados de las Killer Queries muestran que el umbral todavía necesita ser calibrado, ya que una consulta válida obtuvo una distancia de 0.3198 mientras que la consulta fuera del dominio obtuvo 0.2857. Por lo tanto, actualmente no alcanza con utilizar únicamente la distancia para separar consultas válidas de consultas fuera del dominio.
-
-En este caso también puede utilizarse la intención FUERA_DE_ALCANCE definida en la Entrega 1 para detectar una consulta que no corresponda al scouting de fútbol antes de realizar la búsqueda vectorial.
+La Killer Query 3 tuvo distancia 0.2857 en la corrida anterior, por debajo de 0.33. Por tanto, la distancia por sí sola no separa consultas válidas de consultas fuera del dominio. El código rechaza este caso por sus términos explícitos de básquet antes de buscar. El límite de 0.33 es provisional y debe recalibrarse con un conjunto mayor de consultas futbolísticas y ajenas al dominio; la regla de palabras no cubre todas las formas posibles de una consulta fuera de alcance.
 
 ## C.3 - Cierre: dónde se conecta
 

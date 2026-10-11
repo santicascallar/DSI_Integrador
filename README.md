@@ -15,3 +15,4 @@
 ### Pipeline ChromaDB e Ingesta con Upsert: python vector_db.py
 ### ETL y purga: python etl_purga.py
 ### Killer queries: python killer_queries.py
+### Demostración upsert B.3: python evento_negocio.py

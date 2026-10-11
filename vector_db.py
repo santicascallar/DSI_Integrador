@@ -44,9 +44,23 @@ for doc in documentos:
     embeddings.append(vector)
     textos.append(texto)
     
+    meta_doc = doc["metadatos"]
+    posicion = meta_doc.get("posicion", meta_doc.get("position"))
+    if posicion is None:
+        raise KeyError(f"No se encontró posicion en los metadatos de {doc_id}")
+
+    vigente = meta_doc.get("vigente", True)
+    if isinstance(vigente, str):
+        vigente = vigente.strip().lower()
+        if vigente not in {"true", "false"}:
+            raise ValueError(f"Valor inválido para vigente en {doc_id}: {vigente!r}")
+        vigente = vigente == "true"
+    elif not isinstance(vigente, bool):
+        raise TypeError(f"vigente debe ser bool o str en {doc_id}")
+
     meta_plana = {
-        "posicion": doc["metadatos"]["posicion"],
-        "vigente": str(doc["metadatos"]["vigente"]),
+        "posicion": posicion,
+        "vigente": vigente,
         "tags": ", ".join(doc["metadatos"]["tags_regionales"])
     }
     metadatos.append(meta_plana)
@@ -86,15 +100,21 @@ def buscar_jugadores(query_semantica: str, posicion_filtro: str, solo_activos: b
     filtro_where = {
         "$and": [
             {"posicion": {"$eq": posicion_filtro}},
-            {"vigente": {"$eq": str(solo_activos)}}
+            {"vigente": {"$eq": solo_activos}}
         ]
     }
+
+    response_query = client_genai.models.embed_content(
+        model="gemini-embedding-001",
+        contents=query_semantica
+    )
+    vector_query = response_query.embeddings[0].values
     
     print(f"\n- BÚSQUEDA HÍBRIDA -")
     print(f"Consulta: '{query_semantica}' | Filtro: Posición = {posicion_filtro}, Vigente = {solo_activos}")
 
     resultados = coleccion.query(
-        query_embeddings=[vector_q],
+        query_embeddings=[vector_query],
         n_results=n_results,
         where=filtro_where
     )

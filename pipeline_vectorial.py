@@ -25,6 +25,14 @@ if os.path.exists(INDEX_FILE):
     print(f"Cargando índice FAISS existente desde '{INDEX_FILE}'...")
     index = faiss.read_index(INDEX_FILE)
 else:
+    index = None
+
+if index is None or index.ntotal != len(documentos):
+    if index is not None:
+        print(
+            f"El índice contiene {index.ntotal} vectores y la base tiene "
+            f"{len(documentos)} documentos. Se reconstruirá el índice."
+        )
     print("Generando embeddings con la API de Google...")
     
     embeddings = []
@@ -44,6 +52,8 @@ else:
 
     faiss.write_index(index, INDEX_FILE)
     print(f"Índice persistido correctamente en '{INDEX_FILE}'.")
+else:
+    print(f"Índice válido: {index.ntotal} vectores para {len(documentos)} documentos.")
 
 consultas_prueba = [
     "Necesito un extremo rápido que haga la banda y desequilibre en el uno contra uno",
