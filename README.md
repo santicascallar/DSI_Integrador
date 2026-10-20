@@ -16,3 +16,8 @@
 ### ETL y purga: python etl_purga.py
 ### Killer queries: python killer_queries.py
 ### Demostración upsert B.3: python evento_negocio.py
+## Entrega 3
+
+El sistema RAG con LCEL, chunking, reranking y evaluación RAGAS está en
+[entrega_3/README.md](entrega_3/README.md). El informe y las evidencias se guardan
+en esa carpeta, como pide el PDF. Usa la base original `chroma_db/` de Entrega 2.
