@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
+ORIGINAL_DB = ROOT / 'entrega 2' / 'chroma_db'
 LOCAL = ROOT / '.entrega3_local'
 OUT = LOCAL / 'ejecuciones'
 COLLECTION = 'futbol_inform_scouting'
@@ -38,7 +39,7 @@ def save_json(path, value):
 
 
 def original_collection():
-    path = ROOT / 'chroma_db'
+    path = ORIGINAL_DB
     if not (path / 'chroma.sqlite3').is_file():
         raise FileNotFoundError(f'Falta la base ORIGINAL de Entrega 2: {path}')
     collection = chromadb.PersistentClient(path=str(path)).get_collection(COLLECTION)
@@ -59,7 +60,7 @@ def fingerprint(documents):
 
 
 class GeminiEmbeddings(Embeddings):
-    """Mismo modelo, dimensión y parámetros por defecto que vector_db.py."""
+    """Mismo modelo, dimensión y parámetros por defecto que la Entrega 2."""
     def __init__(self):
         key = os.getenv('GEMINI_API_KEY')
         if not key:
@@ -108,7 +109,7 @@ def reindex(size=180, overlap=40):
         name=name, metadata={'hnsw:space': 'cosine'})
     collection.add(ids=[f"{d.metadata['source_id']}:{d.metadata['start_index']}" for d in chunks],
                    documents=[d.page_content for d in chunks], metadatas=[d.metadata for d in chunks], embeddings=vectors)
-    manifest = {'collection': name, 'original_collection': COLLECTION, 'original_path': '../chroma_db',
+    manifest = {'collection': name, 'original_collection': COLLECTION, 'original_path': '../entrega 2/chroma_db',
                 'source_fingerprint': fingerprint(documents), 'before': len(documents), 'after': len(chunks),
                 'chunk_size': size, 'chunk_overlap': overlap}
     save_json(OUT / 'indexacion.json', manifest)

@@ -4,6 +4,9 @@ chroma_db
 chroma_db_purgada
 vector_index.faiss
 .venv/
+.venv_e4/
 .uv-cache/
 .uv-python/
 /.entrega3_local/
+/.entrega4_local/
+.pytest_cache

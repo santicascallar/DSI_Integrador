@@ -22,7 +22,7 @@ py -3.12 -m venv .venv
 ```
 
 Configurar `GEMINI_API_KEY` en el `.env` de la raíz y conservar la base original
-`chroma_db/`, colección `futbol_inform_scouting`. El código no vuelve a ingestar ni
+`entrega 2/chroma_db/`, colección `futbol_inform_scouting`. El código no vuelve a ingestar ni
 modifica esa base. Los modelos generador y evaluador predeterminados son
 `gemini-3.1-flash-lite`, configurables con `GEMINI_MODEL` y `RAGAS_MODEL`.
 El embedding es `gemini-embedding-001`, como en Entrega 2.

@@ -4,7 +4,7 @@ Dominio: informes tácticos y scouting de Futbol Inform.
 
 ## A.1–A.2. Arquitectura y reglas de negocio
 
-El básico lee la base original `../chroma_db`, colección `futbol_inform_scouting`, sin reingestar ni cambiar embeddings. LCEL integra recuperación (k=2), prompt con contexto, Gemini y StrOutputParser. La salida conserva respuesta, fuentes y candidatos. El avanzado usa la misma generación y un índice independiente con solapamiento y reranking.
+El básico lee la base original `../entrega 2/chroma_db`, colección `futbol_inform_scouting`, sin reingestar ni cambiar embeddings. LCEL integra recuperación (k=2), prompt con contexto, Gemini y StrOutputParser. La salida conserva respuesta, fuentes y candidatos. El avanzado usa la misma generación y un índice independiente con solapamiento y reranking.
 
 El prompt exige información explícita y citas, prohíbe inventar precios, beneficios, nombres y estadísticas; interpreta la vigencia desde los metadatos. La frase de escape es: No poseo información explícita en el contexto para responder esa consulta.
 Estos guardrails se validan empíricamente; no garantizan por sí solos ausencia de alucinaciones.

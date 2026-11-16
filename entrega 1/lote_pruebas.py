@@ -1,3 +1,4 @@
+from pathlib import Path
 from procesador import analizar_consulta
 from pydantic import ValidationError
 from google.genai.errors import APIError
@@ -40,7 +41,8 @@ for i, user_input in enumerate(casos_prueba, start=1):
     markdown_content += f"¿Validó Pydantic?: {valido_pydantic}\n"
     markdown_content += f"Tipo de error: {tipo_error}\n\n---\n\n"
 
-with open("resultados_lote.md", "w", encoding="utf-8") as f:
+resultados_path = Path(__file__).resolve().parent / "resultados_lote.md"
+with open(resultados_path, "w", encoding="utf-8") as f:
     f.write(markdown_content)
 
 print("Lote finalizado")

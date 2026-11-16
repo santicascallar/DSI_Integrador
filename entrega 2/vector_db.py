@@ -1,10 +1,13 @@
 import os
 import json
+from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 import chromadb
 
-load_dotenv()
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+load_dotenv(ROOT / ".env")
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
@@ -13,11 +16,11 @@ if not api_key:
 client_genai = genai.Client(api_key=api_key)
 
 print("Cargando base_conocimiento.json...")
-with open("base_conocimiento.json", "r", encoding="utf-8") as f:
+with open(HERE / "base_conocimiento.json", "r", encoding="utf-8") as f:
     documentos = json.load(f)
 
 print("Inicializando ChromaDB (PersistentClient)...")
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
+chroma_client = chromadb.PersistentClient(path=str(HERE / "chroma_db"))
 
 coleccion = chroma_client.get_or_create_collection(
     name="futbol_inform_scouting",

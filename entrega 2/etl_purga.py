@@ -1,16 +1,19 @@
 import os
 import json
+from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 import numpy as np
 import chromadb
 
-load_dotenv()
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+load_dotenv(ROOT / ".env")
 api_key = os.getenv("GEMINI_API_KEY")
 client_genai = genai.Client(api_key=api_key)
 
 print("Cargando base de conocimiento cruda...")
-with open("base_conocimiento.json", "r", encoding="utf-8") as f:
+with open(HERE / "base_conocimiento.json", "r", encoding="utf-8") as f:
     documentos_raw = json.load(f)
 
 print("\n[ETL] Normalizando claves mal nombradas y tipos de datos")
@@ -130,7 +133,7 @@ print(f"[ETL] Total de documentos listos para persistir: {len(documentos_finales
 
 
 print("\n[ETL] Guardando dataset purgado y normalizado en ChromaDB...")
-chroma_client = chromadb.PersistentClient(path="./chroma_db_purgada")
+chroma_client = chromadb.PersistentClient(path=str(HERE / "chroma_db_purgada"))
 coleccion = chroma_client.get_or_create_collection(
     name="futbol_inform_purgado",
     metadata={"hnsw:space": "cosine"}
@@ -151,5 +154,9 @@ coleccion.upsert(
     documents=textos,
     metadatas=metadatos
 )
+
+ids_obsoletos = sorted(set(coleccion.get()["ids"]) - set(ids))
+if ids_obsoletos:
+    coleccion.delete(ids=ids_obsoletos)
 
 print(f"Proceso ETL y purga completado. Total en ChromaDB purgada: {coleccion.count()}")

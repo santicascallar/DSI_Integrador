@@ -47,7 +47,7 @@ Input: Quiero ver un jugador crack que rompa todo
 Salida del modelo:
 - **Intención:** CONSULTA_PERFIL
 - **Jugador:** None
-- **Criterio:** crack
+- **Criterio:** crack que rompa todo
 - **Posición:** None
 - **Fuente:** None
 - **Archivo:** None

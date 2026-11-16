@@ -1,13 +1,16 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 import chromadb
 
-load_dotenv()
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+load_dotenv(ROOT / ".env")
 api_key = os.getenv("GEMINI_API_KEY")
 client_genai = genai.Client(api_key=api_key)
 
-chroma_client = chromadb.PersistentClient(path="./chroma_db_purgada")
+chroma_client = chromadb.PersistentClient(path=str(HERE / "chroma_db_purgada"))
 try:
     coleccion = chroma_client.get_collection(name="futbol_inform_purgado")
 except:
@@ -106,7 +109,7 @@ for q in queries_pruebas:
 
     resultados_reales.append(f"- {resultado_str}")
 
-archivo_salida = "resultados_reales.md"
+archivo_salida = HERE / "resultados_killer_queries.md"
 with open(archivo_salida, "w", encoding="utf-8") as f:
     f.write("\n".join(resultados_reales))
 

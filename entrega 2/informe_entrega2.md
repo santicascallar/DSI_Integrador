@@ -35,24 +35,24 @@ Esto significa que no hay una alta relación entre C y B ya que queda por debajo
 ## A.5 - Prueba destructiva: volatilidad de la RAM
 
 ### Sin write_index()
-python pipeline_vectorial.py
+python "entrega 2\pipeline_vectorial.py"
 Cargando base_conocimiento.json...
 Generando embeddings con la API de Google (15 documentos procesados)...
 Construyendo índice en memoria RAM...
 [INFO] Índice listo para buscar.
 --- (Simula reinicio del sistema / cierre de la terminal) ---
-python pipeline_vectorial.py (Nueva ejecución)
+python "entrega 2\pipeline_vectorial.py" (Nueva ejecución)
 Cargando base_conocimiento.json...
 [WARN] Archivo 'vector_index.faiss' no encontrado.
 Generando embeddings con la API de Google... ¡NUEVO CONSUMO DE TOKENS! (Se vuelve a gastar cuota de la API innecesariamente).
 
 ### Con write_index()
-python pipeline_vectorial.py (Primera ejecución)
+python "entrega 2\pipeline_vectorial.py" (Primera ejecución)
 Cargando base_conocimiento.json...
 Generando embeddings y guardando con faiss.write_index()...
 Índice persistido correctamente en 'vector_index.faiss'.
 --- (Simula reinicio del sistema / cierre de la terminal) ---
-python pipeline_vectorial.py (Segunda ejecución)
+python "entrega 2\pipeline_vectorial.py" (Segunda ejecución)
 Cargando base_conocimiento.json...
 Cargando índice FAISS existente desde 'vector_index.faiss'...
 [EXITO] Índice recargado desde disco de forma instantánea. [0 tokens consumidos a la API].
@@ -74,12 +74,12 @@ B. Cuando el analista realiza una búsqueda compleja (por ejemplo: "Buscar un ex
 C. Si un scout necesita actualizar el puntaje o eliminar un informe desactualizado de un jugador específico (Update / Delete), FAISS no permite modificar registros individuales de forma sencilla, exigiendo en la mayoría de los casos reconstruir y reindexar toda la matriz vectorial desde cero.
 
 Cómo lo resuelve ChromaDB
-A. Lo resuelve creando una carpeta llamada chroma_db en mi directorio para guardar los datos.
+A. Lo resuelve creando `entrega 2/chroma_db` para guardar los datos.
 B. Lo resuelve integrando filtrado híbrido nativo mediante su parámetro where, permitiendo combinar la similitud vectorial con condiciones estrictas sobre los metadatos en una sola consulta.
 C. Lo resuelve ofreciendo un motor con soporte CRUD completo a través de métodos como upsert, lo que permite modificar o actualizar informes de jugadores de forma individual y eficiente sin necesidad de reindexar toda la base de datos.
 
 ## B.3 - Evento de negocio en caliente
-La demostración está implementada y es ejecutable con `python evento_negocio.py`. Usa la colección persistente, crea un ID temporal, verifica el resultado con `get()` y lo elimina al finalizar.
+La demostración está implementada y es ejecutable con `python "entrega 2\evento_negocio.py"`. Usa la colección persistente, crea un ID temporal, verifica el resultado con `get()` y lo elimina al finalizar.
 
 Salida capturada:
 
@@ -100,9 +100,11 @@ La ETL corrige cuatro problemas del dataset antes de persistirlo:
 
 El corte de distancia coseno deja de ser el valor fijo `0.08`: se calcula en cada corrida como el punto medio entre DOC-016/DOC-017 (par etiquetado como duplicado) y los pares de control DOC-016/DOC-005 y DOC-017/DOC-006 (etiquetados como distintos). Se exige una separación mínima de `0.01`; si no se cumple, la ETL se detiene sin purgar. Así el umbral se basa en distancias de los embeddings actuales, no en una constante sin calibrar. La base JSON actual contiene 17 IDs únicos; el caso de colisión queda cubierto en la transformación para cuando aparezca.
 
+Al persistir, la ETL sincroniza la colección purgada: después del upsert elimina IDs que ya no están en el resultado, para que las reejecuciones no conserven documentos obsoletos.
+
 ## B.6 - Killer Queries
 
-Las siguientes salidas fueron generadas por `killer_queries.py` y están registradas en `resultados_reales.md`.
+Las siguientes salidas fueron generadas por `killer_queries.py` y están registradas en `resultados_killer_queries.md`.
 
 ### Consulta 1: 'Preciso un wing eléctrico que desborde por la raya y tire centros venenosos'
 Resultado: DOC-008 | Distancia coseno: 0.3198.
@@ -110,7 +112,7 @@ Evaluación: recupera el informe del extremo ante una consulta expresada con jer
 
 ### Consulta 2: 'Revisión táctica de defensor central tiempista y fuerte'
 Sin filtro: DOC-005 | Distancia coseno: 0.0835.
-Con filtro `posicion=Delantero`: DOC-004 | Distancia coseno: 0.2420.
+Con filtro `posicion=Delantero`: DOC-012 | Distancia coseno: 0.2766.
 Evaluación: sin filtro gana el defensor semánticamente más cercano; con el filtro estricto se devuelve un delantero, demostrando el contraste solicitado.
 
 ### Consulta 3: 'Necesito un base armador con buen manejo de pick and roll para jugadas de tres puntos'

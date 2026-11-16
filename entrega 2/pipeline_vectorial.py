@@ -2,28 +2,31 @@ import os
 import json
 import numpy as np
 import faiss
+from pathlib import Path
 from dotenv import load_dotenv
 from google import genai
 
-load_dotenv()
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+load_dotenv(ROOT / ".env")
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
     raise ValueError("No se encontró la GEMINI_API_KEY en las variables de entorno del archivo .env.")
 
 client = genai.Client(api_key=api_key)
-INDEX_FILE = "vector_index.faiss"
+INDEX_FILE = HERE / "vector_index.faiss"
 
 print("Cargando base_conocimiento.json...")
-with open("base_conocimiento.json", "r", encoding="utf-8") as f:
+with open(HERE / "base_conocimiento.json", "r", encoding="utf-8") as f:
     documentos = json.load(f)
 
 textos = [doc["descripcion_semantica"] for doc in documentos]
 ids = [doc["id"] for doc in documentos]
 
 if os.path.exists(INDEX_FILE):
-    print(f"Cargando índice FAISS existente desde '{INDEX_FILE}'...")
-    index = faiss.read_index(INDEX_FILE)
+    print(f"Cargando índice FAISS existente desde '{INDEX_FILE.name}'...")
+    index = faiss.read_index(str(INDEX_FILE))
 else:
     index = None
 
@@ -50,8 +53,8 @@ if index is None or index.ntotal != len(documentos):
     index = faiss.IndexFlatL2(dimension)
     index.add(matriz_vectores)
 
-    faiss.write_index(index, INDEX_FILE)
-    print(f"Índice persistido correctamente en '{INDEX_FILE}'.")
+    faiss.write_index(index, str(INDEX_FILE))
+    print(f"Índice persistido correctamente en '{INDEX_FILE.name}'.")
 else:
     print(f"Índice válido: {index.ntotal} vectores para {len(documentos)} documentos.")
 

@@ -1,10 +1,11 @@
 import chromadb
+from pathlib import Path
 
-
+HERE = Path(__file__).resolve().parent
 ID_PRUEBA = "__B3_UPSERT_DEMO__"
 ID_REFERENCIA = "DOC-001"
 
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
+chroma_client = chromadb.PersistentClient(path=str(HERE / "chroma_db"))
 coleccion = chroma_client.get_collection(name="futbol_inform_scouting")
 
 if coleccion.get(ids=[ID_PRUEBA])["ids"]:
