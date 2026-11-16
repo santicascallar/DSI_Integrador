@@ -15,3 +15,41 @@ Los escenarios automatizados se ejecutan con `pytest entrega_4/tests`.
 La demostración manual de persistencia HTTP después de reiniciar el servidor está
 documentada en `README.md`: usar el mismo `thread_id`, reiniciar Uvicorn y consultar
 `GET /estado/{thread_id}`.
+
+## Resultados observados en el cierre
+
+La suite local final aprobó **26 pruebas**. Evidencia:
+[salida de pytest](evidencias/pytest.txt) y [reporte JUnit](evidencias/pytest.xml).
+Los agentes y el RAG de estos tests son dobles; SQLite, la API y los validadores
+sí se ejecutan. Esto no acredita por sí solo elección autónoma del modelo real.
+
+| Escenario adicional | Resultado observado | Prueba |
+|---|---|---|
+| Lectura o negación no habilitan escritura | Cinco variantes rechazadas como autorización | `test_mentions_and_negations_do_not_authorize_writes` |
+| Entrada larga se registra | Una consulta, un error y un bloqueo; no se llama al agente | `test_http_rejects_oversized_input_before_invoking_agent` |
+| Hilo inválido | 422 y bloqueo contado; no se refleja email de la entrada | `test_invalid_thread_is_counted_without_echoing_input` |
+| Errores de ejecución | 503 por límite y 502 por fallo; contador de errores incrementado | `test_execution_errors_are_counted_and_do_not_expose_details` |
+| Persistencia vía HTTP | Historial conserva cuatro mensajes al reabrir la aplicación | `test_http_memory_survives_server_restart` |
+
+## Validación del modelo real
+
+`python -m entrega_4.validacion_real` comprueba los siguientes escenarios y
+exporta `evidencias/validacion_http.json` con estados, tiempos, respuestas y
+herramientas observadas. `aprobado=true` acredita que sus aserciones terminaron.
+
+| Escenario | Comprobación automática |
+|---|---|
+| RAG | Llamada a `buscar_informes_scouting` y cita DOC-006 |
+| Actuador | Llamada a `registrar_nota_seguimiento` |
+| Sensor | Llamada a `consultar_notas_seguimiento`, sin nueva escritura |
+| Reinicio y memoria | Dos procesos Uvicorn consecutivos, historial idéntico y respuesta que recuerda Jugador Demo |
+| Guardrails | Inyección y exceso de longitud devuelven 422 |
+
+La corrida real del 16/11/2026 aprobó los seis escenarios: cuatro respuestas
+HTTP 200 y dos bloqueos HTTP 422, con historial idéntico de seis mensajes después
+de reiniciar. Evidencia: [validacion_http.json](evidencias/validacion_http.json).
+La traza posterior con destino corregido fue leída y verificada remotamente:
+[langsmith.json](evidencias/langsmith.json). Incluye agente, herramienta RAG y
+tres llamadas al modelo, sin error, con 2.261 tokens y costo USD 0,0009515.
+Comando: `python -m entrega_4.exportar_trazas --evidence comprobacion_tracing.json`.
+Las trazas de la corrida HTTP original no se recuperaron en este workspace.

@@ -28,8 +28,7 @@ _CUIL_PATTERN = re.compile(r"(?<!\d)(?:\d{2}-\d{8}-\d|\d{11})(?!\d)")
 _DNI_PATTERN = re.compile(r"(?<!\d)\d{7,8}(?!\d)")
 
 _WRITE_INTENT = re.compile(
-    r"\b(registr(a|á|ar)|guard(a|á|ar)|anot(a|á|ar)|agend(a|á|ar)|"
-    r"seguimiento|dej(a|á) asentad[oa])\b",
+    r"^\s*(?:por favor[, ]+)?(?:registr[aá]|guard[aá]|anot[aá]|agend[aá]|dej[aá] asentad[oa])\b",
     re.I,
 )
 
@@ -85,4 +84,6 @@ def mask_personal_data(text: str) -> str:
 
 def explicitly_requests_write(text: str) -> bool:
     """Return whether the user explicitly asked to persist a scouting note."""
+    # Conservative command grammar: mentions, questions and negations do not
+    # grant permission. The user can retry with an explicit imperative.
     return bool(_WRITE_INTENT.search(text))

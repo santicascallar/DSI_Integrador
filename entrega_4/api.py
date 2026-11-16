@@ -8,8 +8,9 @@ from pathlib import Path
 from typing import Callable
 from uuid import uuid4
 
-from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.errors import GraphRecursionError
 from pydantic import BaseModel, Field, field_validator
@@ -26,8 +27,9 @@ from .guardrails import (
 from .metrics import MetricsStore, configure_logging
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / ".entrega4_local"
-load_dotenv(ROOT / ".env", encoding="utf-8-sig")
+# agent.py already loaded .env and resolved the tracing destination. Reloading
+# here would restore legacy LANGSMITH_PROJECT and conflict with agent addressing.
+DATA_DIR = Path(os.getenv("ENTREGA4_DATA_DIR", str(ROOT / ".entrega4_local")))
 logger = logging.getLogger("entrega4")
 _THREAD_ID_PATTERN = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 
@@ -36,7 +38,7 @@ class ConsultationRequest(BaseModel):
     """Validated request body for a single agent turn."""
 
     consulta: str = Field(min_length=1, max_length=MAX_INPUT_LENGTH)
-    thread_id: str | None = Field(default=None, min_length=1, max_length=128)
+    thread_id: str | None = Field(default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9._:-]+$")
 
     @field_validator("consulta", mode="before")
     @classmethod
@@ -117,10 +119,22 @@ def create_app(
 
     app = FastAPI(title="Futbol Inform — Agente de scouting", version="1.0.0", lifespan=lifespan)
 
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request: Request, exc: RequestValidationError):
+        if request.method == "POST" and request.url.path == "/consultar":
+            app.state.metrics.record_request(
+                (time.perf_counter() - request.state.started_at) * 1000,
+                is_error=True, is_blocked=True,
+            )
+        # Do not echo the rejected body or personal data in validation errors.
+        return JSONResponse(status_code=422, content={"detail": "Entrada inválida: revisar consulta (1–4000 caracteres) y thread_id."})
+
     @app.middleware("http")
     async def request_logging(request, call_next):
         request_id = request.headers.get("x-request-id") or str(uuid4())
         start = time.perf_counter()
+        request.state.started_at = start
+        request.state.request_id = request_id
         response = await call_next(request)
         latency_ms = (time.perf_counter() - start) * 1000
         logger.info(
@@ -142,13 +156,10 @@ def create_app(
         return {"status": "ok" if ready else "starting", "agent_ready": ready}
 
     @app.post("/consultar", dependencies=[Depends(_check_api_key)])
-    def consultar(body: ConsultationRequest):
+    def consultar(body: ConsultationRequest, request: Request):
         """Run a guarded agent turn and persist conversation state by thread ID."""
-        request_id = str(uuid4())
+        request_id = request.state.request_id
         thread_id = body.thread_id or str(uuid4())
-        if not _THREAD_ID_PATTERN.fullmatch(thread_id):
-            raise HTTPException(status_code=422, detail="thread_id tiene caracteres no permitidos.")
-
         start = time.perf_counter()
         usage = {
             "tokens_entrada": 0,

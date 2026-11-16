@@ -1,0 +1,33 @@
+{
+  "agent_id": "futbol-inform-entrega-4",
+  "environment": "production",
+  "http_status": 200,
+  "resultado": {
+    "thread_id": "demo-tracing",
+    "respuesta": "Las habilidades que definen al arquero moderno, según el informe [DOC-006], son las siguientes:\n\n*   **Dominio del juego de pies:** Fundamental para la salida desde el fondo.\n*   **Seguridad en los centros cruzados:** Capacidad para cortar envíos laterales con solvencia.\n*   **Achique en mano a mano:** Eficacia para reducir espacios ante delanteros rivales.\n*   **Transición rápida:** Rapidez para iniciar contrataques mediante saques frontales.\n*   **Rol de arquero líbero:** Capacidad para jugar adelantado y participar en la construcción.\n*   **Reflejos y juego aéreo:** Atributos técnicos esenciales para la protección del arco.",
+    "trace_id": "ff1bb6da-c95a-476f-9d22-121c8e93ae91",
+    "tokens_entrada": 1952,
+    "tokens_salida": 309,
+    "costo_estimado_usd": 0.0009515
+  },
+  "recepcion_langsmith": [
+    {
+      "path": "/runs/multipart",
+      "status": 202
+    },
+    {
+      "path": "/runs/multipart",
+      "status": 202
+    },
+    {
+      "path": "/runs/multipart",
+      "status": 202
+    },
+    {
+      "path": "/runs/multipart",
+      "status": 202
+    }
+  ],
+  "lectura_remota_verificada": true,
+  "url_privada": "https://smith.langchain.com/o/7d384bbb-09b7-41d2-b850-2bee1e88e57c/projects/p/01a1e589-991d-7e65-9c28-b2a58f4ef23a/r/ff1bb6da-c95a-476f-9d22-121c8e93ae91?poll=true"
+}

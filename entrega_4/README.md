@@ -1,5 +1,9 @@
 # Entrega 4 — Agente de scouting con LangGraph y API REST
 
+Para instalación desde un clon limpio, ejemplos con autenticación y validación
+real automática, seguir el [README principal](../README.md). Los entregables de
+cierre están en [informe.md](../informe.md) y [ficha_tecnica.md](../ficha_tecnica.md).
+
 El agente amplía el RAG de Entrega 3 con tres herramientas de dominio:
 
 1. `buscar_informes_scouting`: consulta el retriever RAG de Entrega 3 y devuelve
@@ -25,7 +29,8 @@ DNI y CUIL; las citas de fuentes se conservan.
 - Python 3.12.
 - La colección `futbol_inform_scouting` de Entrega 2 en `entrega 2/chroma_db/`.
 - `GEMINI_API_KEY` en el `.env` compartido de la raíz.
-- Opcional: `LANGSMITH_API_KEY` y `LANGSMITH_TRACING=true` para trazas.
+- `LANGSMITH_API_KEY` y `LANGSMITH_TRACING=true` para las trazas exigidas en la entrega
+  (el servicio puede funcionar sin tracing, pero no completa esa evidencia).
 
 Desde la raíz del repositorio:
 
@@ -39,17 +44,11 @@ Gemini conserva las firmas requeridas para tool calling en Gemini 3. Esto evita
 alterar las dependencias de LangChain/RAGAS de Entrega 3; ambos entornos leen la
 misma colección persistente de Entrega 2.
 
-Si todavía no existe la colección, primero crearla desde la raíz:
-
-```powershell
-.venv_e4\Scripts\python.exe "entrega 2\vector_db.py"
-```
-
 Configurar los valores necesarios en el `.env` de la raíz; las variables nuevas
 están documentadas en el `.env.example` compartido:
 
 ```powershell
-Copy-Item .env.example .env
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
 Hacer esa copia solo si todavía no existe `.env`; conservar las claves privadas
@@ -59,7 +58,8 @@ localmente y nunca subir el archivo.
 GEMINI_API_KEY=...
 LANGSMITH_API_KEY=...
 LANGSMITH_TRACING=true
-LANGSMITH_PROJECT_E4=futbol-inform-entrega-4
+LANGSMITH_AGENT_ID=futbol-inform-entrega-4
+LANGSMITH_AGENT_ENVIRONMENT=production
 API_ACCESS_TOKEN=...
 GEMINI_INPUT_USD_PER_MILLION=...
 GEMINI_OUTPUT_USD_PER_MILLION=...
@@ -68,6 +68,12 @@ GEMINI_OUTPUT_USD_PER_MILLION=...
 El costo se estima localmente solo si se cargan ambas tarifas vigentes del
 modelo, expresadas en USD por millón de tokens. Si quedan vacías, la API informa
 el uso de tokens y devuelve costo `null`, evitando mostrar una tarifa supuesta.
+
+Después de configurar `.env`, si todavía no existe la colección, crearla:
+
+```powershell
+.venv_e4\Scripts\python.exe "entrega 2\vector_db.py"
+```
 
 ## Iniciar y probar la API
 
@@ -81,16 +87,18 @@ En otra terminal, comprobar salud y abrir un hilo de conversación:
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8000/health
+$headers = @{}
+# Si hay API_ACCESS_TOKEN: $headers = @{ 'X-API-Key' = 'TU_TOKEN_LOCAL' }
 $body = @{ consulta = "¿Qué habilidades tiene el arquero moderno?"; thread_id = "demo-scout" } | ConvertTo-Json
-Invoke-RestMethod -Method Post http://127.0.0.1:8000/consultar -ContentType "application/json" -Body $body
+Invoke-RestMethod -Method Post http://127.0.0.1:8000/consultar -Headers $headers -ContentType "application/json; charset=utf-8" -Body ([Text.Encoding]::UTF8.GetBytes($body))
 ```
 
 Continuar la conversación y revisar la memoria:
 
 ```powershell
 $body = @{ consulta = "¿Y cómo es su juego aéreo?"; thread_id = "demo-scout" } | ConvertTo-Json
-Invoke-RestMethod -Method Post http://127.0.0.1:8000/consultar -ContentType "application/json" -Body $body
-Invoke-RestMethod http://127.0.0.1:8000/estado/demo-scout
+Invoke-RestMethod -Method Post http://127.0.0.1:8000/consultar -Headers $headers -ContentType "application/json; charset=utf-8" -Body ([Text.Encoding]::UTF8.GetBytes($body))
+Invoke-RestMethod http://127.0.0.1:8000/estado/demo-scout -Headers $headers
 ```
 
 Para demostrar persistencia por HTTP, detener Uvicorn, volver a iniciarlo con el
@@ -112,7 +120,9 @@ red pública sin TLS, autenticación y controles operativos adicionales.
 
 ## Observabilidad y defensa
 
-Las trazas LangSmith usan el proyecto `LANGSMITH_PROJECT_E4`. En LangSmith se
+Las trazas usan `LANGSMITH_AGENT_ID` y `LANGSMITH_AGENT_ENVIRONMENT`; registrar
+primero el agente en LangSmith. Los valores por defecto son
+`futbol-inform-entrega-4` y `production`. En LangSmith se
 puede inspeccionar cada ejecución y sus llamadas anidadas al agente, al retriever
 y a Gemini; los logs JSON y `/metricas` agregan tokens y estimación de costo.
 Los logs se escriben en consola y en `.entrega4_local/logs.jsonl`.

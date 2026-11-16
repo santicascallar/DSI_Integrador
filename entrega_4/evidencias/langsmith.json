@@ -1,0 +1,162 @@
+{
+  "agent_id": "futbol-inform-entrega-4",
+  "environment": "production",
+  "evidencia_origen": "comprobacion_tracing.json",
+  "trazas_verificadas": [
+    {
+      "escenario": "RAG con destino verificado",
+      "trace_id": "ff1bb6da-c95a-476f-9d22-121c8e93ae91",
+      "url_privada": "https://smith.langchain.com/o/7d384bbb-09b7-41d2-b850-2bee1e88e57c/projects/p/01a1e589-991d-7e65-9c28-b2a58f4ef23a/r/ff1bb6da-c95a-476f-9d22-121c8e93ae91?poll=true",
+      "name": "futbol_inform_agente",
+      "error": false,
+      "seconds": 36.142871,
+      "prompt_tokens": 1952,
+      "completion_tokens": 309,
+      "total_tokens": 2261,
+      "costo_langsmith_usd": "0.0009515",
+      "costo_estimado_api_usd": 0.0009515,
+      "llamadas": [
+        {
+          "name": "agent",
+          "run_type": "chain",
+          "total_tokens": 611
+        },
+        {
+          "name": "call_model",
+          "run_type": "chain",
+          "total_tokens": 611
+        },
+        {
+          "name": "RunnableSequence",
+          "run_type": "chain",
+          "total_tokens": 611
+        },
+        {
+          "name": "Prompt",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "ChatGoogleGenerativeAI",
+          "run_type": "llm",
+          "total_tokens": 611
+        },
+        {
+          "name": "should_continue",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "tools",
+          "run_type": "chain",
+          "total_tokens": 507
+        },
+        {
+          "name": "buscar_informes_scouting",
+          "run_type": "tool",
+          "total_tokens": 507
+        },
+        {
+          "name": "rag_basico",
+          "run_type": "chain",
+          "total_tokens": 507
+        },
+        {
+          "name": "RunnableAssign<retrieved>",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "RunnableParallel<retrieved>",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "recuperacion",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "RunnableAssign<sources>",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "RunnableParallel<sources>",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "seleccion_contexto",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "RunnableAssign<answer>",
+          "run_type": "chain",
+          "total_tokens": 507
+        },
+        {
+          "name": "RunnableParallel<answer>",
+          "run_type": "chain",
+          "total_tokens": 507
+        },
+        {
+          "name": "generacion_respuesta",
+          "run_type": "chain",
+          "total_tokens": 507
+        },
+        {
+          "name": "RunnableLambda",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "ChatPromptTemplate",
+          "run_type": "prompt",
+          "total_tokens": 0
+        },
+        {
+          "name": "ChatGoogleGenerativeAI",
+          "run_type": "llm",
+          "total_tokens": 507
+        },
+        {
+          "name": "StrOutputParser",
+          "run_type": "parser",
+          "total_tokens": 0
+        },
+        {
+          "name": "agent",
+          "run_type": "chain",
+          "total_tokens": 1143
+        },
+        {
+          "name": "call_model",
+          "run_type": "chain",
+          "total_tokens": 1143
+        },
+        {
+          "name": "RunnableSequence",
+          "run_type": "chain",
+          "total_tokens": 1143
+        },
+        {
+          "name": "Prompt",
+          "run_type": "chain",
+          "total_tokens": 0
+        },
+        {
+          "name": "ChatGoogleGenerativeAI",
+          "run_type": "llm",
+          "total_tokens": 1143
+        },
+        {
+          "name": "should_continue",
+          "run_type": "chain",
+          "total_tokens": 0
+        }
+      ]
+    }
+  ]
+}

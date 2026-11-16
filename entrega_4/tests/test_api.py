@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.errors import GraphRecursionError
+import pytest
 
 from entrega_4.api import create_app
 
@@ -84,11 +86,42 @@ def test_api_key_is_required_when_configured(tmp_path, monkeypatch):
         assert client.get("/metricas", headers={"X-API-Key": "test-token"}).status_code == 200
 
 
+def test_invalid_thread_is_counted_without_echoing_input(tmp_path):
+    agent = FakeAgent()
+    app = create_app(data_dir=tmp_path, runtime_factory=lambda *args: agent)
+    with TestClient(app) as client:
+        response = client.post("/consultar", json={"consulta": "scout@example.com", "thread_id": "../invalid"})
+        assert response.status_code == 422
+        assert "scout@example.com" not in response.text
+        assert agent.calls == []
+        assert client.get("/metricas").json()["bloqueos"] == 1
+
+
+@pytest.mark.parametrize("exception,status", [(GraphRecursionError("limit"), 503), (RuntimeError("private"), 502)])
+def test_execution_errors_are_counted_and_do_not_expose_details(tmp_path, exception, status):
+    class FailingAgent(FakeAgent):
+        def invoke(self, question, thread_id):
+            raise exception
+
+    app = create_app(data_dir=tmp_path, runtime_factory=lambda *args: FailingAgent())
+    with TestClient(app) as client:
+        response = client.post("/consultar", json={"consulta": "Consulta de prueba"})
+        assert response.status_code == status
+        assert "private" not in response.text
+        snapshot = client.get("/metricas").json()
+        assert snapshot["consultas"] == 1
+        assert snapshot["errores"] == 1
+
+
 def test_http_rejects_oversized_input_before_invoking_agent(tmp_path):
     agent = FakeAgent()
     app = create_app(data_dir=tmp_path, runtime_factory=lambda *args: agent)
     with TestClient(app) as client:
         response = client.post("/consultar", json={"consulta": "x" * 4001})
+        metrics = client.get("/metricas").json()
+        assert metrics["consultas"] == 1
+        assert metrics["bloqueos"] == 1
+        assert metrics["errores"] == 1
 
     assert response.status_code == 422
     assert agent.calls == []

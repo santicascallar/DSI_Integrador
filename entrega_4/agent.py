@@ -15,11 +15,15 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env", encoding="utf-8-sig")
-os.environ["LANGSMITH_PROJECT"] = os.getenv(
-    "LANGSMITH_PROJECT_E4", "futbol-inform-entrega-4"
-)
+os.environ.setdefault("LANGSMITH_AGENT_ID", "futbol-inform-entrega-4")
+os.environ.setdefault("LANGSMITH_AGENT_ENVIRONMENT", "production")
 
 from entrega_3 import rag_pipeline
+
+# E3 loads the shared .env as well. Remove legacy destinations after that import
+# so agent addressing has one unambiguous destination in this process.
+for _legacy_destination in ("LANGSMITH_PROJECT", "LANGCHAIN_PROJECT", "LANGCHAIN_SESSION"):
+    os.environ.pop(_legacy_destination, None)
 
 from .domain_store import ScoutingStore
 from .guardrails import explicitly_requests_write
